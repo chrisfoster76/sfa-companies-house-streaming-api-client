@@ -25,6 +25,9 @@ namespace StreamingClientTest
             await FetchData(ApiStream.Officers);
             await FetchData(ApiStream.PersonsWithSignificantControl);
 
+            //await FetchData(ApiStream.Test);
+            //await FetchData(ApiStream.HistoryTest);
+
             Console.WriteLine("Complete");
             Console.ReadKey();
         }
@@ -57,18 +60,33 @@ namespace StreamingClientTest
 
             var response = await client.GetAsync(timepoint);
 
+            if (!response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("Unable to connect...");
+                return;
+            }
+
             var stream = await response.Content.ReadAsStreamAsync();
 
             using var sr = new StreamReader(stream);
-            string line;
 
             var maxTimeReached = false;
+            var noMoreData = false;
             var stopwatch = Stopwatch.StartNew();
 
-            while (!maxTimeReached && (line = await sr.ReadLineAsync()) != null) //todo: never null??
+            while (!maxTimeReached && !noMoreData)
             {
+                var line = await sr.ReadLineAsync();
+
                 Console.CursorLeft = 0;
 
+                if (line == null)
+                {
+                    Console.Write(" * no more data *     ");
+                    noMoreData = true;
+                    continue;
+                }
+                
                 if (string.IsNullOrWhiteSpace(line))
                 {
                     Console.Write(" * heartbeat *          ");

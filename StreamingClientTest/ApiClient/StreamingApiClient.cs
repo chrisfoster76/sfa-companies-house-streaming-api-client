@@ -3,27 +3,31 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using Polly;
 using StreamingClientTest.Config;
+using StreamingClientTest.Policies;
 
 namespace StreamingClientTest.ApiClient
 {
     public sealed class StreamingApiClient : IStreamingApiClient
     {
         private readonly HttpClient _httpClient;
-        private readonly string _baseUrl = "https://stream.companieshouse.gov.uk";
+        private readonly string _baseUrl;
         private readonly string _url;
         private readonly string _apiUser;
 
-        public StreamingApiClient(string url)
+        public StreamingApiClient(string baseUrl, string url)
         {
             var configService = new ConfigurationService();
             var config = configService.GetAppConfig();
 
             _apiUser = config.StreamingApiUser;
 
+            _baseUrl = baseUrl;
+            _url = url;
+
             _httpClient = new HttpClient();
             _httpClient.BaseAddress = new Uri(_baseUrl);
-            _url = url;
         }
 
         public async Task<HttpResponseMessage> GetAsync(long? timepoint)
@@ -41,23 +45,11 @@ namespace StreamingClientTest.ApiClient
 
             Console.WriteLine($"Getting {url}");
 
-            var response = await _httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
+            var response = await Policy
+                .WrapAsync(RetryPolicies.RetryPolicy, RetryPolicies.BackOffPolicy)
+                .ExecuteAsync(() => _httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead));
 
-            Console.Write($"Status Code: ");
-            if (response.IsSuccessStatusCode)
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine(response.StatusCode);
-            }
-            else
-            {
-                Console.ForegroundColor = ConsoleColor.DarkRed;
-                Console.WriteLine(response.StatusCode);
-            }
-
-            Console.ForegroundColor = ConsoleColor.White;
-
-            Console.WriteLine("Response (headers) received");
+            ConsoleUtilities.ShowHttpStatusCode(response.StatusCode);
 
             return response;
         }

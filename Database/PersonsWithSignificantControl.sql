@@ -1,4 +1,4 @@
-﻿CREATE TABLE [dbo].[Event]
+﻿CREATE TABLE [dbo].[PersonsWithSignificantControl]
 (
 	[Timepoint] BIGINT NOT NULL PRIMARY KEY,
 	[PublishedAt] DATETIME2 NOT NULL,

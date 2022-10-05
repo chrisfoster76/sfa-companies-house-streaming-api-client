@@ -6,7 +6,7 @@ namespace StreamingClientTest.ApiClient
     {
         public IStreamingApiClient GetClient(ApiStream apiStream)
         {
-            return new StreamingApiClient(apiStream.GetUrl());
+            return new StreamingApiClient(apiStream.GetBaseUrl(), apiStream.GetUrl());
         }
     }
 }
