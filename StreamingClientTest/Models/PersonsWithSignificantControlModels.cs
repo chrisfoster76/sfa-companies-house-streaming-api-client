@@ -34,6 +34,14 @@ namespace StreamingClientTest.Models
 
         [JsonPropertyName("data")]
         public JsonElement Data { get; set; }
+
+        public string ProviderCompanyNumber
+        {
+            get
+            {
+                return ResourceUri.Substring(9, 8);
+            }
+        }
     }
 
 

@@ -21,7 +21,7 @@ namespace StreamingClientTest.Storage
             _tableName = tableName;
         }
 
-        public async Task StoreEvent(StreamingApiEvent eventData)
+        public async Task StoreEvent(StreamingApiEvent eventData, bool isRoatpProvider)
         {
             var persistenceModel = new Data.EventData
             {
@@ -31,10 +31,11 @@ namespace StreamingClientTest.Storage
                 ResourceUri = eventData.ResourceUri,
                 Type = eventData.EventData.Type,
                 ResourceKind = eventData.ResourceKind,
+                IsRoatpProvider = isRoatpProvider
             };
 
             var sql =
-                $"insert into [{_tableName}] (Timepoint, PublishedAt, Type, ResourceUri, ResourceKind, Data) values (@Timepoint, @PublishedAt, @Type, @ResourceUri, @ResourceKind, @Data)";
+                $"insert into [{_tableName}] (Timepoint, PublishedAt, Type, ResourceUri, ResourceKind, Data, IsRoatpProvider) values (@Timepoint, @PublishedAt, @Type, @ResourceUri, @ResourceKind, @Data, @IsRoatpProvider)";
 
             try
             {

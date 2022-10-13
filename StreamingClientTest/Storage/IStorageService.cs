@@ -6,7 +6,7 @@ namespace StreamingClientTest.Storage
 {
     public interface IStorageService : IDisposable
     {
-        Task StoreEvent(StreamingApiEvent eventData);
+        Task StoreEvent(StreamingApiEvent eventData, bool isRoatpProvider);
         Task<long?> GetLastTimepoint();
     }
 }

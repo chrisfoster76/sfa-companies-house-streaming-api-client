@@ -12,6 +12,6 @@ namespace StreamingClientTest.Data
 
         public string Data { get; set; }
         public string ResourceKind { get; set; }
-
+        public bool IsRoatpProvider { get; set; }
     }
 }
