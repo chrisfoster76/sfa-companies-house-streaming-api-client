@@ -13,7 +13,7 @@ namespace StreamingClientTest
 {
     static class Program
     {
-        private static readonly int MaxStreamReadTimeSeconds = 120;
+        private static readonly int MaxStreamReadTimeSeconds = 300;
 
         public static async Task Main(string[] args)
         {
@@ -25,8 +25,6 @@ namespace StreamingClientTest
             await FetchData(ApiStream.CompanyProfile);
             await FetchData(ApiStream.Officers);
             await FetchData(ApiStream.PersonsWithSignificantControl);
-            //await FetchData(ApiStream.Test);
-            //await FetchData(ApiStream.HistoryTest);
 
             Console.WriteLine("Complete");
             Console.ReadKey();
@@ -36,8 +34,8 @@ namespace StreamingClientTest
         {
             Console.WriteLine($"Fetching data from {apiStream}");
 
-            var providerCompanies = (await File.ReadAllLinesAsync(@"LocalData\ProviderCompanies.txt")).ToList();
-            Console.WriteLine($"Filtering for changes to {providerCompanies.Count} companies");
+            var providerService = new RoatpService();
+            var providers = providerService.GetProviders();
 
             IStorageServiceFactory storageServiceFactory = new StorageServiceFactory();
             IStreamingApiClientFactory clientFactory = new StreamingApiClientFactory();
@@ -101,7 +99,7 @@ namespace StreamingClientTest
                     var pscEventData = JsonSerializer.Deserialize<StreamingApiEvent>(line);
                     Console.Write($"Timepoint: {pscEventData.EventData.Timepoint}");
 
-                    var isRoatpProvider = providerCompanies.Contains(pscEventData.ProviderCompanyNumber);
+                    var isRoatpProvider = providers.Any(x=> x.CompanyNumber == pscEventData.ProviderCompanyNumber);
 
                     await storageService.StoreEvent(pscEventData, isRoatpProvider);
                 }

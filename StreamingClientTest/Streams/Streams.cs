@@ -16,7 +16,7 @@
             return apiStream switch
             {
                 ApiStream.HistoryTest => "companies",
-                ApiStream.Test => "stream/429",
+                ApiStream.Test => "stream",
                 ApiStream.CompanyProfile => "companies",
                 ApiStream.Officers => "officers",
                 ApiStream.PersonsWithSignificantControl => "persons-with-significant-control",
